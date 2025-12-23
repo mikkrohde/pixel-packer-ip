@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_rgb_sampler;
+module tb_rgb_sampler_frame;
 
     reg clk = 0;
     reg rst_n = 0;
@@ -19,6 +19,7 @@ module tb_rgb_sampler;
     reg        cfg_enable_sampler;
     reg        cfg_enable_line;
     reg        cfg_enable_frame;
+    reg        cfg_continuous_mode;
 
     // Read side
     reg  rd_en;
@@ -64,6 +65,7 @@ module tb_rgb_sampler;
         .cfg_enable_sampler(cfg_enable_sampler),
         .cfg_enable_line(cfg_enable_line),
         .cfg_enable_frame(cfg_enable_frame),
+        .cfg_continuous_mode(cfg_continuous_mode),
 
         .rd_en(rd_en),
         .rd_addr(rd_addr),
@@ -134,9 +136,9 @@ module tb_rgb_sampler;
     // Single test: given RGB widths, send a small frame and check counts
     // ----------------------------------------------------------------
     task run_width_test;
-    input [3:0] tr_r_width;
-    input [3:0] tr_g_width;
-    input [3:0] tr_b_width;
+        input [3:0] tr_r_width;
+        input [3:0] tr_g_width;
+        input [3:0] tr_b_width;
     begin
         $display("=== BASIC TEST: R=%0d, G=%0d, B=%0d ===", tr_r_width, tr_g_width, tr_b_width);
     
@@ -149,6 +151,7 @@ module tb_rgb_sampler;
         cfg_enable_sampler = 1;
         cfg_enable_line    = 1;
         cfg_enable_frame   = 0;
+        cfg_continuous_mode = 0;
     
         // Reset
         repeat (5) @(posedge clk);
@@ -208,110 +211,6 @@ module tb_rgb_sampler;
     endtask
 
     // ----------------------------------------------------------------
-    // REALISTIC LINE BUFFER TEST: Continuous streaming
-    // Fills buffer, then reads oldest line while sampling the second
-    // ----------------------------------------------------------------
-    task run_continuous_stream_test;
-        input [3:0] test_r_width;
-        input [3:0] test_g_width;
-        input [3:0] test_b_width;
-        input [3:0] test_num_lines;
-        integer cycle;
-        integer timeout_counter;
-    begin
-        $display("=== CONTINUOUS STREAM TEST: R=%0d G=%0d B=%0d, %0d lines ===", 
-                 test_r_width, test_g_width, test_b_width, test_num_lines);
-    
-        // Config
-        cfg_width          = 16;
-        cfg_height         = 1000;
-        cfg_num_lines      = test_num_lines;
-        cfg_r_width        = test_r_width;
-        cfg_g_width        = test_g_width;
-        cfg_b_width        = test_b_width;
-        cfg_enable_sampler = 1;
-        cfg_enable_line    = 1;
-        cfg_enable_frame   = 0;
-    
-        // Reset
-        rst_n = 0;
-        vga_r = 0; vga_g = 0; vga_b = 0;
-        vga_hsync = 1; vga_vsync = 1;
-        rd_en = 0; rd_addr = 0;
-        repeat (10) @(posedge clk);
-        rst_n = 1;
-        repeat (10) @(posedge clk);
-    
-        // Trigger frame_active
-        $display("Triggering frame_active...");
-        vga_vsync = 0;
-        repeat (2) @(posedge clk);
-        vga_vsync = 1;
-        repeat (5) @(posedge clk);
-    
-        // Phase 1: Fill buffer (with timeout)
-        $display("Phase 1: Filling %0d lines...", cfg_num_lines);
-        repeat (cfg_num_lines) begin
-            drive_single_line(cfg_width, 8'h10, 8'h20, 8'h30);
-        end
-        
-        // Wait for buffer_ready with timeout counter
-        timeout_counter = 0;
-        while (!buffer_ready && timeout_counter < 2000) begin
-            @(posedge clk);
-            timeout_counter = timeout_counter + 1;
-        end
-        
-        if (!buffer_ready) begin
-            $display("ERROR: buffer_ready timeout after %0d cycles!", timeout_counter);
-            $finish;
-        end
-        
-        if (lines_stored !== cfg_num_lines) begin
-            $display("ERROR: lines_stored=%0d, expected=%0d", lines_stored, cfg_num_lines);
-            $finish;
-        end
-        $display("Buffer ready after %0d cycles: lines_stored=%0d", timeout_counter, lines_stored);
-    
-        // Phase 2: Continuous streaming with timeout protection
-        $display("Phase 2: Continuous streaming (4 cycles)...");
-        for (cycle = 0; cycle < 4; cycle = cycle + 1) begin
-            $display("  Cycle %0d: Writing new line (Line %0d)...", cycle, cfg_num_lines + cycle);
-            
-            // Write new line
-            drive_single_line(cfg_width, 8'h40 + cycle, 8'h50, 8'h60);
-            
-            // Read oldest line with timeout
-            timeout_counter = 0;
-            while (!buffer_ready && timeout_counter < 1000) begin
-                @(posedge clk);
-                timeout_counter = timeout_counter + 1;
-            end
-            
-            if (!buffer_ready) begin
-                $display("ERROR: buffer_ready timeout in read phase, cycle %0d", cycle);
-                $finish;
-            end
-            
-            $display("  Cycle %0d: Reading oldest line (lines_stored=%0d):", cycle, lines_stored);
-            rd_en = 1; 
-            rd_addr = 0;
-            repeat (cfg_width) begin
-                @(posedge clk);
-                if (rd_data[23:16] !== 8'h00) begin
-                    $display("    BUF[%0d]=0x%06h", rd_addr, rd_data);
-                end
-                rd_addr = rd_addr + 1;
-            end
-            rd_en = 0; 
-            rd_addr = 0;
-        end
-        
-        $display("CONTINUOUS STREAM TEST PASSED \n");
-    end
-    endtask
-    
-    // ----------------------------------------------------------------
     // DEBUG: Dump all signals to VCD + data file
     // ----------------------------------------------------------------
     reg [31:0] debug_time_ns;
@@ -322,9 +221,9 @@ module tb_rgb_sampler;
     
     integer debug_file;
     initial begin
-        debug_file = $fopen("rgb_sampler_debug.txt", "w");
+        debug_file = $fopen("rgb_sampler_debug_frame.txt", "w");
         if (debug_file == 0) begin
-            $display("FATAL: Cannot open rgb_sampler_debug.txt!");
+            $display("FATAL: Cannot open rgb_sampler_debug_frame.txt!");
             $finish;
         end
         $fdisplay(debug_file, "Time(ns) | frame_act | line_cnt | pix_cnt | v_cnt | h_cnt | in_act | buf_rdy | lines_st | rd_en | rd_ad | rd_data");
@@ -345,8 +244,8 @@ module tb_rgb_sampler;
     
     // VCD dump
     initial begin
-        $dumpfile("rgb_sampler_debug.vcd");
-        $dumpvars(1, tb_rgb_sampler);
+        $dumpfile("rgb_sampler_debug_frame.vcd");
+        $dumpvars(1, tb_rgb_sampler_frame);
     end
 
     
@@ -381,13 +280,6 @@ module tb_rgb_sampler;
         for (w = 1; w <= 8; w = w + 1) begin
             run_width_test(w[3:0], w[3:0], w[3:0]);
         end
-
-        // Test 2: REALISTIC LINE BUFFER - continuous streaming
-        $display("=");
-        $display("TEST PHASE 2: CONTINUOUS STREAMING LINE BUFFER");
-        $display("=");
-        run_continuous_stream_test(8,8,8, 4);  // 8-bit RGB, 4-line buffer
-        run_continuous_stream_test(4,6,8, 2);  // Mixed RGB widths, 2-line buffer
 
         $display("=");
         $display("ALL TESTS COMPLETED SUCCESSFULLY");

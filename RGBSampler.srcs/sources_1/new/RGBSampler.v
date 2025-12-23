@@ -141,7 +141,7 @@ module rgb_sampler #(
                     pixel_count <= 16'd0;
                     
                     // Process line if 
-                    if (v_counter < cfg_height && frame_active) begin
+                    if ((v_counter < cfg_height && frame_active) || cfg_continuous_mode) begin
                         line_active <= 1'b1;
                         in_active_area <= 1'b1;
                         buf_wr_line_start <= 1'b1;
