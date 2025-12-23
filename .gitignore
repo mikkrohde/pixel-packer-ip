@@ -1,0 +1,203 @@
+# ==============================================================================
+# .gitignore for Vivado Projects on GitHub
+# Keeps: .xpr, source files, constraints, IP configs, block designs
+# Ignores: Build artifacts, simulation outputs, generated files
+# ==============================================================================
+
+# ============================================================================== 
+# Vivado Logs and Journals
+# ==============================================================================
+*.jou
+*.log
+*.debug
+*.str
+
+# ==============================================================================
+# Vivado Build Directories (IGNORE - can be regenerated)
+# ==============================================================================
+*.cache/
+*.hw/
+*.ip_user_files/
+*.sim/
+*.runs/
+*.gen/
+.Xil/
+
+# ==============================================================================
+# Vivado Temporary and Backup Files
+# ==============================================================================
+*.backup.*
+vivado*.backup.*
+vivado_*.str
+*_webtalk.*
+webtalk.*
+usage_statistics_webtalk.*
+.jobs/
+
+# ==============================================================================
+# Simulation Outputs
+# ==============================================================================
+*.vcd
+*.saif
+*.wdb
+*.wcfg
+*.pb
+xsim.dir/
+xsim*.log
+xvlog.pb
+xelab.pb
+isim/
+isim.log
+*.tcl.log
+
+# ==============================================================================
+# Synthesis/Implementation Outputs (IGNORE - regenerated on build)
+# ==============================================================================
+*.bit
+*.bin
+*.mcs
+*.prm
+*.ltx
+*.dcp
+*.hwdef
+*.sysdef
+*.hdf
+*.html
+
+# Individual report files (keep only key reports if needed)
+*.rpt
+*.xml
+*.txt
+# EXCEPTION: Keep utilization reports if you want to track them
+!*utilization*.rpt
+!*timing_summary*.rpt
+
+# ==============================================================================
+# Auto-Generated HDL Files (from IP/BD)
+# ==============================================================================
+*_stub.v
+*_stub.vhdl
+*_funcsim.v
+*_funcsim.vhdl
+*_sim_netlist.v
+*_sim_netlist.vhdl
+
+# ==============================================================================
+# IP Core Generated Files (Mostly Auto-Generated)
+# ==============================================================================
+# Keep IP .xci files, ignore generated outputs
+*.data/
+**/ip/**/*.vhd
+**/ip/**/*.vho
+**/ip/**/*.veo
+**/ip/**/synth/
+**/ip/**/sim/
+**/ip/**/example_design/
+**/ip/**/*.dcp
+
+# ==============================================================================
+# Block Design Generated Files
+# ==============================================================================
+# Keep the .bd file, ignore generated HDL wrapper and IP internals
+**/bd/*/hdl/*_wrapper.v
+**/bd/*/hdl/*_wrapper.vhd
+**/bd/*/ip/**/synth/
+**/bd/*/sim/
+**/bd/*/.Xil/
+**/bd/*/hw_handoff/
+**/bd/*/.srcs/
+
+# EXCEPTION: Keep the block design source and any custom HDL
+!**/bd/*.bd
+!**/bd/**/hdl/*.v
+!**/bd/**/hdl/*.vhd
+
+# ==============================================================================
+# SDK/Vitis Workspace (if applicable)
+# ==============================================================================
+*.sdk/
+.metadata/
+*.hdf
+
+# ==============================================================================
+# IP Repository Generated Files (from your packaging)
+# ==============================================================================
+# Keep component.xml and TCL, ignore build artifacts
+ip_repo/**/.Xil/
+ip_repo/**/*.log
+ip_repo/**/*.jou
+
+# ==============================================================================
+# Miscellaneous Vivado Files
+# ==============================================================================
+*.os
+*.vdi
+*.wdf
+*.vds
+*.dmp
+*.rpx
+fsm_encoding.os
+*.zip
+
+# ==============================================================================
+# OS and Editor Files
+# ==============================================================================
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.bak
+.vscode/
+.idea/
+*.sublime-*
+
+# ==============================================================================
+# Python (if using scripts)
+# ==============================================================================
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.env
+
+# ==============================================================================
+# Keep These Important Files (Override Patterns Above)
+# ==============================================================================
+# Project file
+!*.xpr
+
+# Source files
+!src/**/*.v
+!src/**/*.vhd
+!src/**/*.sv
+!rtl/**/*.v
+!rtl/**/*.vhd
+!hdl/**/*.v
+!hdl/**/*.vhd
+
+# Constraints
+!*.xdc
+!constraints/**/*.xdc
+
+# IP configuration files
+!*.xci
+
+# Block design source
+!*.bd
+
+# TCL scripts
+!scripts/**/*.tcl
+!*.tcl
+
+# Testbenches
+!sim/**/*.v
+!sim/**/*.vhd
+!tb/**/*.v
+!tb/**/*.vhd
+
+# Documentation and config
+!README.md
+!LICENSE
+!*.pdf
+!docs/**/*
