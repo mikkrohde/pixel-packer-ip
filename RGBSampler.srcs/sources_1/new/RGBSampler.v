@@ -32,20 +32,20 @@ module rgb_sampler #(
     input wire                      rst_n,
     
     // VGA input signals
-    input wire [MAX_R_WIDTH-1:0]    vga_r,
-    input wire [MAX_G_WIDTH-1:0]    vga_g,
-    input wire [MAX_B_WIDTH-1:0]    vga_b,
-    input wire                      vga_hsync,
-    input wire                      vga_vsync,
+    input wire [MAX_R_WIDTH-1:0]    in_vga_r,
+    input wire [MAX_G_WIDTH-1:0]    in_vga_g,
+    input wire [MAX_B_WIDTH-1:0]    in_vga_b,
+    input wire                      in_vga_hsync,
+    input wire                      in_vga_vsync,
     
     // Configuration
-    input wire [15:0]               cfg_width,       // Active pixels per line
-    input wire [15:0]               cfg_height,      // Active lines per frame
-    input wire [3:0]                cfg_r_width,     // Actual R channel width (1-8)
-    input wire [3:0]                cfg_g_width,     // Actual G channel width (1-8)
-    input wire [3:0]                cfg_b_width,     // Actual B channel width (1-8)
-    input wire                      cfg_enable,      // Enable sampling
-    input wire                      cfg_continuous_mode, // Enable continous mode for hsync-based stream sampling
+    input wire [15:0]               VPU_cfg_width,       // Active pixels per line
+    input wire [15:0]               VPU_cfg_height,      // Active lines per frame
+    input wire [3:0]                VPU_cfg_r_width,     // Actual R channel width (1-8)
+    input wire [3:0]                VPU_cfg_g_width,     // Actual G channel width (1-8)
+    input wire [3:0]                VPU_cfg_b_width,     // Actual B channel width (1-8)
+    input wire                      VPU_cfg_enable,      // Enable sampling
+    input wire                      VPU_cfg_continuous_mode, // Enable continous mode for hsync-based stream sampling
     
     // VideoBuffer write interface
     output reg                                      buf_wr_en,
@@ -55,10 +55,10 @@ module rgb_sampler #(
     output reg [$clog2(MAX_WIDTH*MAX_HEIGHT)-1:0]   buf_wr_addr,
     
     // Status
-    output reg [15:0]                 pixel_count,
-    output reg [15:0]                 line_count,
-    output reg                         frame_active,
-    output reg                         line_active
+    output reg [15:0]   pixel_count,
+    output reg [15:0]   line_count,
+    output reg          frame_active,
+    output reg          line_active
 );
 
     // Sync signal edge detection
@@ -207,16 +207,16 @@ module RGBSampler #(
     input wire                      vga_vsync,
     
     // Configuration
-    input wire [15:0]               cfg_width,
-    input wire [15:0]               cfg_height,
-    input wire [3:0]                cfg_num_lines,
-    input wire [3:0]                cfg_r_width,
-    input wire [3:0]                cfg_g_width,
-    input wire [3:0]                cfg_b_width,
-    input wire                      cfg_enable_sampler,
-    input wire                      cfg_enable_line,
-    input wire                      cfg_enable_frame,
-    input wire                      cfg_continuous_mode,
+    input wire [15:0]               VPU_cfg_width,
+    input wire [15:0]               VPU_cfg_height,
+    input wire [3:0]                VPU_cfg_num_lines,
+    input wire [3:0]                VPU_cfg_r_width,
+    input wire [3:0]                VPU_cfg_g_width,
+    input wire [3:0]                VPU_cfg_b_width,
+    input wire                      VPU_cfg_enable_sampler,
+    input wire                      VPU_cfg_enable_line,
+    input wire                      VPU_cfg_enable_frame,
+    input wire                      VPU_cfg_continuous_mode,
     
     // VideoBuffer read interface
     input  wire                      rd_en,
