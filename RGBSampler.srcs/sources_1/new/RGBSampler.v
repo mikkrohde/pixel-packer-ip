@@ -35,8 +35,8 @@ module rgb_sampler #(
     input wire [MAX_R_WIDTH-1:0]    in_vga_r,
     input wire [MAX_G_WIDTH-1:0]    in_vga_g,
     input wire [MAX_B_WIDTH-1:0]    in_vga_b,
-    input wire                      in_vga_hsync,
-    input wire                      in_vga_vsync,
+    input wire                      VPU_hsync,
+    input wire                      VPU_vsync,
     
     // Configuration
     input wire [15:0]               VPU_cfg_width,       // Active pixels per line
@@ -200,11 +200,11 @@ module RGBSampler #(
     input wire                      rst_n,
     
     // VGA input signals
-    input wire [7:0]                vga_r,
-    input wire [7:0]                vga_g,
-    input wire [7:0]                vga_b,
-    input wire                      vga_hsync,
-    input wire                      vga_vsync,
+    input wire [7:0]                in_vga_r,
+    input wire [7:0]                in_vga_g,
+    input wire [7:0]                in_vga_b,
+    input wire                      VPU_hsync,
+    input wire                      VPU_vsync,
     
     // Configuration
     input wire [15:0]               VPU_cfg_width,
@@ -252,19 +252,19 @@ module RGBSampler #(
         .clk(clk),
         .rst_n(rst_n),
         // VGA inputs
-        .vga_r(vga_r),
-        .vga_g(vga_g),
-        .vga_b(vga_b),
-        .vga_hsync(vga_hsync),
-        .vga_vsync(vga_vsync),
+        .in_vga_r(in_vga_r),
+        .in_vga_g(in_vga_g),
+        .in_vga_b(in_vga_b),
+        .in_vga_hsync(VPU_hsync),
+        .in_vga_vsync(VPU_vsync),
         // Configuration
-        .cfg_width(cfg_width),
-        .cfg_height(cfg_height),
-        .cfg_r_width(cfg_r_width),
-        .cfg_g_width(cfg_g_width),
-        .cfg_b_width(cfg_b_width),
-        .cfg_enable(cfg_enable_sampler),
-        .cfg_continuous_mode(cfg_continuous_mode),
+        .VPU_cfg_width(cfg_width),
+        .VPU_cfg_height(cfg_height),
+        .VPU_cfg_r_width(cfg_r_width),
+        .VPU_cfg_g_width(cfg_g_width),
+        .VPU_cfg_b_width(cfg_b_width),
+        .VPU_cfg_enable(cfg_enable_sampler),
+        .VPU_cfg_continuous_mode(cfg_continuous_mode),
         // Buffer interface
         .buf_wr_en(sampler_wr_en),
         .buf_wr_data(sampler_wr_data),
