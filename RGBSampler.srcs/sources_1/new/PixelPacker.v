@@ -22,7 +22,8 @@
 
 module PixelPacker #(
     parameter PIXEL_WIDTH       = 24,
-    parameter MAX_CHANNEL_WIDTH = 8
+    parameter MAX_CHANNEL_WIDTH = 8,
+    parameter ENABLE_FRAME_SCALING = 0
 )(
     input wire                      clk,
     input wire                      rst_n,
@@ -65,7 +66,6 @@ module PixelPacker #(
     // e.g. cfg_r_width=5 on an 8-bit input: mask = 8'b00011111
     //      This allows supporting sources with fewer than 8 bits per channel
     //      (e.g. 5-bit R from a 15-bit RGB source like PC Engine).
-
     wire [MAX_CHANNEL_WIDTH-1:0] r_mask = ({MAX_CHANNEL_WIDTH{1'b1}} >> (MAX_CHANNEL_WIDTH - VPU_cfg_r_width));
     wire [MAX_CHANNEL_WIDTH-1:0] g_mask = ({MAX_CHANNEL_WIDTH{1'b1}} >> (MAX_CHANNEL_WIDTH - VPU_cfg_g_width));
     wire [MAX_CHANNEL_WIDTH-1:0] b_mask = ({MAX_CHANNEL_WIDTH{1'b1}} >> (MAX_CHANNEL_WIDTH - VPU_cfg_b_width));
